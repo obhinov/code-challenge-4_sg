@@ -28,6 +28,15 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
     environment:
       TABLE_NAME: ${self:custom.DynamoDBTableName}
+  updateUser:
+    handler: updateUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:UpdateItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
   
 
 resources: # CloudFormation template syntax from here on.
@@ -62,6 +71,11 @@ custom:
         request: false
         response: false
         field: createUser
+      - dataSource: updateUser
+        type: Mutation
+        request: false
+        response: false
+        field: updateUser
     dataSources:
       - type: AWS_LAMBDA
         name: readUser
@@ -71,3 +85,7 @@ custom:
         name: createUser
         config:
           lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-createUser
+      - type: AWS_LAMBDA
+        name: updateUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-updateUser
