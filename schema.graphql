@@ -7,3 +7,9 @@ type User {
 	name: String!
 	job: String!
 }
+
+type Mutation {
+    createUser(id: String, name: String, job: String): Boolean
+    updateUser(id: String, name: String, job: String): Boolean
+    deleteUser(id: String): Boolean
+}

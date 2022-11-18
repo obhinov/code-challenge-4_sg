@@ -19,6 +19,16 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
     environment:
       TABLE_NAME: ${self:custom.DynamoDBTableName}
+  createUser:
+    handler: createUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:PutItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
+  
 
 resources: # CloudFormation template syntax from here on.
   Resources:
@@ -47,8 +57,17 @@ custom:
         request: false
         response: false
         field: getUserById
+      - dataSource: createUser
+        type: Mutation
+        request: false
+        response: false
+        field: createUser
     dataSources:
       - type: AWS_LAMBDA
         name: readUser
         config:
           lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-readUser
+      - type: AWS_LAMBDA
+        name: createUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-createUser
