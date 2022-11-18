@@ -3,9 +3,52 @@ frameworkVersion: '3'
 provider:
   name: aws
   runtime: nodejs12.x
-
-
+  region: us-east-2
+  stage: ${opt:stage, "dev"} # sls deploy --stage test (or staging, dev, prod)
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-appsync-plugin
 
 functions:
-  hello:
-    handler: handler.hello
+  readUser:
+    handler: readUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:GetItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
+
+resources: # CloudFormation template syntax from here on.
+  Resources:
+    appsyncTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.DynamoDBTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+custom:
+  DynamoDBTableName: ${self:service}-table-${self:provider.stage}
+  appSync:
+    name: ${self:service}-api-${self:provider.stage}
+    authenticationType: API_KEY
+    schema:
+      - "schema.graphql"
+    mappingTemplates:
+      - dataSource: readUser
+        type: Query
+        request: false
+        response: false
+        field: getUserById
+    dataSources:
+      - type: AWS_LAMBDA
+        name: readUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-readUser

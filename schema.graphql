@@ -1,0 +1,9 @@
+type Query {
+	getUserById(userId: ID!): User
+}
+
+type User {
+	id: ID!
+	name: String!
+	job: String!
+}
