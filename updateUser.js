@@ -8,7 +8,7 @@ const dynamoTable = process.env.TABLE_NAME;
 exports.handler = async (event) => {
     console.log("Received event: ", JSON.stringify(event, 3));
     try {
-        if (event.info.fieldName=="updateUserInfo"){
+        if (event.info.fieldName=="updateUser"){
             await updateUserInfo(event.arguments);
             response = true;
         }
