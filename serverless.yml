@@ -37,7 +37,15 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
     environment:
       TABLE_NAME: ${self:custom.DynamoDBTableName}
-  
+  deleteUser:
+    handler: deleteUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:DeleteItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
 
 resources: # CloudFormation template syntax from here on.
   Resources:
@@ -76,6 +84,11 @@ custom:
         request: false
         response: false
         field: updateUser
+      - dataSource: deleteUser
+        type: Mutation
+        request: false
+        response: false
+        field: deleteUser
     dataSources:
       - type: AWS_LAMBDA
         name: readUser
@@ -89,3 +102,7 @@ custom:
         name: updateUser
         config:
           lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-updateUser
+      - type: AWS_LAMBDA
+        name: deleteUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-deleteUser
