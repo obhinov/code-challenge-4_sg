@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const dynamoDocClient = new AWS.DynamoDB.DocumentClient();
 
-var response = false;
+var response;
 
 const dynamoTable = process.env.TABLE_NAME;
 
@@ -15,6 +15,7 @@ exports.handler = async (event) => {
         
     } catch (e) {
         console.log("Error: ", e);
+        response = false;
     }
     console.log(response);
     return response;
