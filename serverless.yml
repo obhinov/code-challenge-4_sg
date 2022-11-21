@@ -2,7 +2,7 @@ service: sls-appsync-backend-app
 frameworkVersion: '3'
 provider:
   name: aws
-  runtime: nodejs12.x
+  runtime: nodejs16.x
   region: us-east-2
   stage: ${opt:stage, "dev"} # sls deploy --stage test (or staging, dev, prod)
 plugins:
