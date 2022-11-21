@@ -10,8 +10,8 @@ exports.handler = async (event) => {
     try {
         if (event.info.fieldName=="createUser"){
             await createUser(event.arguments);
-            response = true;
         }
+        response = true;
         
     } catch (e) {
         console.log(e)

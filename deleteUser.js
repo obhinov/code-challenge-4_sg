@@ -10,8 +10,8 @@ exports.handler = async (event) => {
     try {
         if (event.info.fieldName=="deleteUser"){
             await deleteUser(event.arguments);
-            response = true;
         }
+        response = true;
         
     } catch (e) {
         console.log(e)
