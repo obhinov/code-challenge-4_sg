@@ -19,6 +19,7 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
     environment:
       TABLE_NAME: ${self:custom.DynamoDBTableName}
+
   createUser:
     handler: createUser.handler
     iamRoleStatements:
@@ -28,6 +29,7 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
     environment:
       TABLE_NAME: ${self:custom.DynamoDBTableName}
+
   updateUser:
     handler: updateUser.handler
     iamRoleStatements:
@@ -37,6 +39,7 @@ functions:
         Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
     environment:
       TABLE_NAME: ${self:custom.DynamoDBTableName}
+      
   deleteUser:
     handler: deleteUser.handler
     iamRoleStatements:

@@ -1,7 +1,7 @@
 const AWS = require('aws-sdk');
 const dynamoDocClient = new AWS.DynamoDB.DocumentClient();
 
-var response;
+var response; // returns either true or false
 
 const dynamoTable = process.env.TABLE_NAME;
 
