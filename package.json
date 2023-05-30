@@ -1,0 +1,25 @@
+{
+  "name": "code-challenge-4_sg",
+  "version": "1.0.0",
+  "description": "Code challenge 4 for Serverless Guru",
+  "main": "handler.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/obhinov/code-challenge-4_sg.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/obhinov/code-challenge-4_sg/issues"
+  },
+  "homepage": "https://github.com/obhinov/code-challenge-4_sg#readme",
+  "devDependencies": {
+    "serverless-iam-roles-per-function": "^3.2.0"
+  },
+  "dependencies": {
+    "serverless-appsync-plugin": "^1.14.0"
+  }
+}

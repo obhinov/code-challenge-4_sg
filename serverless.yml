@@ -1,0 +1,111 @@
+service: sls-appsync-backend-app
+frameworkVersion: '3'
+provider:
+  name: aws
+  runtime: nodejs16.x
+  region: us-east-2
+  stage: ${opt:stage, "dev"} # sls deploy --stage test (or staging, dev, prod)
+plugins:
+  - serverless-iam-roles-per-function
+  - serverless-appsync-plugin
+
+functions:
+  readUser:
+    handler: readUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:GetItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
+
+  createUser:
+    handler: createUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:PutItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
+
+  updateUser:
+    handler: updateUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:UpdateItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
+      
+  deleteUser:
+    handler: deleteUser.handler
+    iamRoleStatements:
+      - Effect: "Allow"        
+        Action:
+          - dynamodb:DeleteItem        
+        Resource: arn:aws:dynamodb:${self:provider.region}:${aws:accountId}:table/${self:custom.DynamoDBTableName}
+    environment:
+      TABLE_NAME: ${self:custom.DynamoDBTableName}
+
+resources: # CloudFormation template syntax from here on.
+  Resources:
+    appsyncTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.DynamoDBTableName}
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: id
+            KeyType: HASH
+
+custom:
+  DynamoDBTableName: ${self:service}-table-${self:provider.stage}
+  appSync:
+    name: ${self:service}-api-${self:provider.stage}
+    authenticationType: API_KEY
+    schema:
+      - "schema.graphql"
+    mappingTemplates:
+      - dataSource: readUser
+        type: Query
+        request: false
+        response: false
+        field: getUserById
+      - dataSource: createUser
+        type: Mutation
+        request: false
+        response: false
+        field: createUser
+      - dataSource: updateUser
+        type: Mutation
+        request: false
+        response: false
+        field: updateUser
+      - dataSource: deleteUser
+        type: Mutation
+        request: false
+        response: false
+        field: deleteUser
+    dataSources:
+      - type: AWS_LAMBDA
+        name: readUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-readUser
+      - type: AWS_LAMBDA
+        name: createUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-createUser
+      - type: AWS_LAMBDA
+        name: updateUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-updateUser
+      - type: AWS_LAMBDA
+        name: deleteUser
+        config:
+          lambdaFunctionArn: arn:aws:lambda:${self:provider.region}:${aws:accountId}:function:${self:service}-${self:provider.stage}-deleteUser
